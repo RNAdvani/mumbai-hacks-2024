@@ -99,7 +99,7 @@ export async function createTeammates(
             if (existingUser) {
               // Check if existingUser is not part of coWorkers field before pushing
               const isUserAlreadyInCoWorkers =
-                organisationExist.coWorkers.includes(existingUser._id)
+                !!organisationExist.coWorkers.find((coworker) => coworker.toString() === existingUser._id.toString())
 
               if (!isUserAlreadyInCoWorkers) {
                 organisation = await Organisation.findOneAndUpdate(

@@ -127,33 +127,6 @@ const Signin: NextPage = () => {
             </form>
           </Paper>
         </Flex>
-
-        <Center p="xl">
-          <MantineButton
-            component="a"
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/adeolaadeoti"
-            leftIcon={<IoLogoGithub size="1.4rem" />}
-            styles={(theme) => ({
-              root: {
-                backgroundColor: 'transparent',
-                fontSize: '1.2rem',
-                fontWeight: 300,
-                color: '#737780',
-                '&:not([data-disabled])': theme.fn.hover({
-                  color: theme.fn.darken('#373A40', 0.08),
-                  backgroundColor: 'transparent',
-                }),
-              },
-              leftIcon: {
-                marginRight: theme.spacing.xs,
-              },
-            })}
-          >
-            adeolaadeoti
-          </MantineButton>
-        </Center>
       </Stack>
     </Center>
   )

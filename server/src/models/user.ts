@@ -7,13 +7,17 @@ export interface UserSchemaType {
   _id: mongoose.Types.ObjectId
   username?: string
   email?: string
-  role?: string
   phone?: string
   profilePicture?: string
   isOnline?: boolean
   loginVerificationCode?: string
   loginVerificationCodeExpires?: Date
-  googleId?: string
+  googleId?: string,
+  role: 'owner' | 'manager' | 'employee'
+  managedProjects?: mongoose.Types.ObjectId[]
+  assignedTasks?: mongoose.Types.ObjectId[]
+  department?: string
+  skills?: string[]
   getSignedJwtToken?: () => string
   getVerificationCode?: () => string
 }
@@ -32,9 +36,24 @@ const userSchema = new mongoose.Schema<UserSchemaType>(
       unique: true,
       match: [/^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/, 'Please enter a valid email'],
     },
+    role: {
+      type: String,
+      enum: ['owner', 'manager', 'employee'],
+      required: true,
+      default: 'employee'
+    },
+    department: String,
+    skills: [String],
+    managedProjects: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project'
+    }],
+    assignedTasks: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Task'
+    }],
     googleId: String,
     isOnline: Boolean,
-    role: String,
     phone: String,
     profilePicture: String,
     loginVerificationCode: String,
