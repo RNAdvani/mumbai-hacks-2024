@@ -80,5 +80,16 @@ const taskSchema = new mongoose_1.default.Schema({
     timestamps: true,
     versionKey: false,
 });
+taskSchema.post('save', function () {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const project = yield mongoose_1.default.model('Project').findById(this.project);
+        if (project) {
+            const tasks = yield mongoose_1.default.model('Task').find({ project: project._id });
+            const totalProgress = tasks.reduce((sum, task) => sum + task.progress, 0);
+            project.progress = Math.round(totalProgress / tasks.length);
+            yield project.save();
+        }
+    });
+});
 exports.Task = mongoose_1.default.models.Task || mongoose_1.default.model('Task', taskSchema);
 //# sourceMappingURL=task.js.map

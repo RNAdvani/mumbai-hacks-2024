@@ -65,5 +65,21 @@ const projectSchema = new mongoose_1.default.Schema({
     timestamps: true,
     versionKey: false,
 });
+projectSchema.pre('save', function (next) {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        if (this.isNew) {
+            const channel = yield mongoose_1.default.model('Channel').create({
+                name: `project-${this.name.toLowerCase().replace(/\s+/g, '-')}`,
+                collaborators: [this.manager, ...this.team],
+                title: `Project Channel: ${this.name}`,
+                description: this.description,
+                organisation: this.organisation,
+                isChannel: true,
+            });
+            this.channel = channel._id;
+        }
+        next();
+    });
+});
 exports.Project = mongoose_1.default.models.Project || mongoose_1.default.model('Project', projectSchema);
 //# sourceMappingURL=project.js.map

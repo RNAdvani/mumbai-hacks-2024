@@ -85,4 +85,19 @@ interface ProjectSchemaType {
     }
   )
 
+  projectSchema.pre('save', async function(next) {
+    if (this.isNew) {
+      const channel = await mongoose.model('Channel').create({
+        name: `project-${this.name.toLowerCase().replace(/\s+/g, '-')}`,
+        collaborators: [this.manager, ...this.team],
+        title: `Project Channel: ${this.name}`,
+        description: this.description,
+        organisation: this.organisation,
+        isChannel: true,
+      })
+      this.channel = channel._id
+    }
+    next()
+  })
+
   export const Project = mongoose.models.Project || mongoose.model('Project', projectSchema)

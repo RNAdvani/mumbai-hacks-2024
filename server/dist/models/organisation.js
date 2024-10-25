@@ -16,6 +16,39 @@ const organisationSchema = new mongoose_1.default.Schema({
             ref: 'User',
         },
     ],
+    departments: [String],
+    managers: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: 'User',
+        }],
+    projects: [{
+            type: mongoose_1.default.Schema.Types.ObjectId,
+            ref: 'Project',
+        }],
+    settings: {
+        allowEmployeeTaskCreation: {
+            type: Boolean,
+            default: true,
+        },
+        defaultTaskChannel: {
+            type: Boolean,
+            default: true,
+        },
+        notificationPreferences: {
+            taskAssignment: {
+                type: Boolean,
+                default: true,
+            },
+            taskStatusChange: {
+                type: Boolean,
+                default: true,
+            },
+            projectUpdates: {
+                type: Boolean,
+                default: true,
+            },
+        },
+    },
     joinLink: String,
     url: String,
 }, {

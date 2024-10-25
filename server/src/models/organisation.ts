@@ -8,7 +8,19 @@ export interface OrganisationSchemaType {
   coWorkers: mongoose.Schema.Types.ObjectId[] & UserSchemaType[]
   generateJoinLink: () => string
   joinLink: string
-  url: string
+  url: string,
+  departments: string[]
+  managers: mongoose.Schema.Types.ObjectId[]
+  projects: mongoose.Schema.Types.ObjectId[]
+  settings: {
+    allowEmployeeTaskCreation: boolean
+    defaultTaskChannel: boolean
+    notificationPreferences: {
+      taskAssignment: boolean
+      taskStatusChange: boolean
+      projectUpdates: boolean
+    }
+  }
 }
 
 const organisationSchema = new mongoose.Schema<OrganisationSchemaType>(
@@ -26,6 +38,39 @@ const organisationSchema = new mongoose.Schema<OrganisationSchemaType>(
         ref: 'User',
       },
     ],
+    departments: [String],
+    managers: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    }],
+    projects: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+    }],
+    settings: {
+      allowEmployeeTaskCreation: {
+        type: Boolean,
+        default: true,
+      },
+      defaultTaskChannel: {
+        type: Boolean,
+        default: true,
+      },
+      notificationPreferences: {
+        taskAssignment: {
+          type: Boolean,
+          default: true,
+        },
+        taskStatusChange: {
+          type: Boolean,
+          default: true,
+        },
+        projectUpdates: {
+          type: Boolean,
+          default: true,
+        },
+      },
+    },
     joinLink: String,
     url: String,
   },

@@ -107,6 +107,15 @@ interface TaskSchemaType {
       versionKey: false,
     }
   )
+  taskSchema.post('save', async function() {
+    const project = await mongoose.model('Project').findById(this.project)
+    if (project) {
+      const tasks = await mongoose.model('Task').find({ project: project._id })
+      const totalProgress = tasks.reduce((sum, task) => sum + task.progress, 0)
+      project.progress = Math.round(totalProgress / tasks.length)
+      await project.save()
+    }
+  })
 
 export const Task = mongoose.models.Task || mongoose.model('Task', taskSchema)
   
