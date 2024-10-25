@@ -1,36 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Slack Clone Client Repository
+
+- Api repository https://github.com/adeolaadeoti/slack-clone-api
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [Features](#features)
+- [Getting Started](#getting-started)
+  - [Installation](#installation)
+- [Usage](#usage)
+  - [User Registration](#user-registration)
+  - [Creating Channels](#creating-channels)
+  - [Sending Messages](#sending-messages)
+  - [Message Replies (Threads)](#message-replies-threads)
+  - [Huddle with Other Users](#huddle-with-other-users)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Introduction
+
+Slack clone is a powerful team collaboration platform that allows you to communicate and collaborate with your team members in real-time. Whether you're working remotely or in the same office, our application provides a seamless and efficient way to stay connected.
+
+![Screenshot](https://res.cloudinary.com/adeolaadeoti/image/upload/v1695161023/screenshot_jsd2mf.png)
+
+## Features
+
+- Real-time chat and messaging
+- Channel-based communication
+- Direct messaging between users
+- File and media sharing
+- Customizable notifications
+- **Message Replies (Threads)**
+  - Start threads to reply to specific messages in a conversation.
+  - Keep discussions organized and focused.
+- **Huddle with Other Users**
+  - Create private huddles for group discussions.
+  - Collaborate with select team members in a secure environment.
 
 ## Getting Started
 
-First, run the development server:
+### Installation
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Clone the repository:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+   ```bash
+   git clone https://github.com/adeolaadeoti/slack-clone-client.git
+   ```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+2. Change to the project directory:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   cd slack-clone-client
+   ```
 
-## Learn More
+3. Install dependencies:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   yarn
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. Set up environment variables:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   Create a `.env.local` file in the root directory of the project and add the necessary environment variables, including your database connection details and any API keys.
 
-## Deploy on Vercel
+   ```plaintext
+   NEXT_PUBLIC_API=http://localhost:8080/api/v1
+   NEXT_PUBLIC_SOCKET=http://localhost:8080
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Start the application:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   yarn start
+   ```
+
+6. Access the application at `http://localhost:3000`.
+
+## Usage
+
+### User Registration
+
+1. Visit the application's URL.
+
+2. Click on the "Sign Up" or "Register" button to create a new user account.
+
+3. Fill out the registration form with your details.
+
+4. Once registered, you can log in with your credentials.
+
+### Creating Channels
+
+1. After logging in, you can create a new channel by clicking on the "Create Channel" button.
+
+2. Choose a name and description for your channel.
+
+3. Invite team members to join the channel.
+
+### Sending Messages
+
+1. To send a message in a channel, click on the channel's name in the left sidebar.
+
+2. Type your message in the input field at the bottom of the chat window and press Enter to send.
+
+3. You can also send direct messages to other users by clicking on their name in the user list.
+
+### Message Replies (Threads)
+
+1. To start a thread in response to a specific message:
+
+   - Hover over the message you want to reply to.
+
+   - Click on the "Reply" or "Start Thread" button.
+
+   - Type your reply in the thread and send it.
+
+2. Keep discussions organized by using threads to respond to messages.
+
+### Huddle with Other Users
+
+1. To create a private huddle:
+
+   - Click on the "Huddle" button in the sidebar.
+
+   - Select the users you want to include in the huddle.
+
+   - Start your private conversation.
+
+2. Huddles provide a secure environment for group discussions with select team members.
+
+## Contributing
+
+We welcome contributions from the community.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
