@@ -1,0 +1,22 @@
+{
+  "name": "monorepo",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "watch": "concurrently \"npm run watch --prefix server\" \"npm run watch --prefix packages/types\""
+  },
+  "dependencies": {
+    "express": "^4.21.0"
+  },
+  "nohoist": [
+    "**/node_modules/**",
+    "node_modules/**"
+  ],
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
