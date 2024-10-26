@@ -7,7 +7,7 @@ import { TryCatch } from '../helpers/TryCatch'
 import { ErrorHandler } from '../middleware/errorResponse'
 import mongoose from 'mongoose'
 
-export const createMeeting = TryCatch(async (req,res,next) => {
+export const createMeeting = TryCatch(async (req, res, next) => {
   const {
     title,
     description,
@@ -18,12 +18,12 @@ export const createMeeting = TryCatch(async (req,res,next) => {
 
   // Check if user is a manager
   const user = await User.findById(req.user.id)
-  const org = await Organisation.findOne({
-    $or: [{ owner: req.user.id }, { managers: req.user.id }],
-  })
+  const org = await Organisation.findOne({ owner: req.user.id })
 
-  if (!org || (user.role !== 'manager' && user.role !== 'owner')) {
-    return next(new ErrorHandler(403, 'You are not authorized to create a meeting'))
+  if (!org || user.role !== 'manager') {
+    return next(
+      new ErrorHandler(403, 'You are not authorized to create a meeting')
+    )
   }
 
   // Generate unique room ID
@@ -55,53 +55,57 @@ export const createMeeting = TryCatch(async (req,res,next) => {
   })
 })
 
-export const joinMeeting  = TryCatch(async (req,res,next) => {
+export const joinMeeting = TryCatch(async (req, res, next) => {
   const { meetingId } = req.params
 
-    const meeting = await Meeting.findById(meetingId)
-    if (!meeting) {
-      return next(new ErrorHandler(404, 'Meeting not found'))
-    }
+  const meeting = await Meeting.findById(meetingId)
+  if (!meeting) {
+    return next(new ErrorHandler(404, 'Meeting not found'))
+  }
 
-    // Check if user is part of the organization
-    const org = await Organisation.findById(meeting.organisation)
-    if (
-      !org.coWorkers.includes(req.user.id as unknown as mongoose.Schema.Types.ObjectId) &&
-      !org.managers.includes(req.user.id as unknown as mongoose.Schema.Types.ObjectId) &&
-      org.owner.toString() !== req.user.id
-    ) {
-      return res.status(403).json({
-        success: false,
-        message: 'You are not authorized to join this meeting',
-      })
-    }
-
-    // Generate participant token
-    const participantToken = generateToken(
-      process.env.ZEGO_APP_ID,
-      process.env.ZEGO_SERVER_SECRET,
-      meeting.roomId,
-      req.user.id
-    )
-
-    // Update participant join time
-    await Meeting.findByIdAndUpdate(meetingId, {
-      $push: {
-        participants: {
-          user: req.user.id,
-          joinedAt: new Date(),
-        },
-      },
+  // Check if user is part of the organization
+  const org = await Organisation.findById(meeting.organisation)
+  if (
+    !org.coWorkers.includes(
+      req.user.id as unknown as mongoose.Schema.Types.ObjectId
+    ) &&
+    !org.managers.includes(
+      req.user.id as unknown as mongoose.Schema.Types.ObjectId
+    ) &&
+    org.owner.toString() !== req.user.id
+  ) {
+    return res.status(403).json({
+      success: false,
+      message: 'You are not authorized to join this meeting',
     })
+  }
 
-    res.status(200).json({
-      success: true,
-      data: {
-        roomId: meeting.roomId,
-        token: participantToken,
+  // Generate participant token
+  const participantToken = generateToken(
+    process.env.ZEGO_APP_ID,
+    process.env.ZEGO_SERVER_SECRET,
+    meeting.roomId,
+    req.user.id
+  )
+
+  // Update participant join time
+  await Meeting.findByIdAndUpdate(meetingId, {
+    $push: {
+      participants: {
+        user: req.user.id,
+        joinedAt: new Date(),
       },
-    })
+    },
   })
+
+  res.status(200).json({
+    success: true,
+    data: {
+      roomId: meeting.roomId,
+      token: participantToken,
+    },
+  })
+})
 
 export const startRecording = TryCatch(async (req, res, next) => {
   const { meetingId } = req.params
@@ -113,7 +117,9 @@ export const startRecording = TryCatch(async (req, res, next) => {
 
   // Check if the user is authorized to start recording
   if (meeting.organizer.toString() !== req.user.id) {
-    return next(new ErrorHandler(403, 'Only meeting organizer can start recording'))
+    return next(
+      new ErrorHandler(403, 'Only meeting organizer can start recording')
+    )
   }
 
   // API request to start recording
@@ -150,7 +156,9 @@ export const endMeeting = TryCatch(async (req, res, next) => {
   }
 
   if (meeting.organizer.toString() !== req.user.id) {
-    return next(new ErrorHandler(403, 'Only meeting organizer can end the meeting'))
+    return next(
+      new ErrorHandler(403, 'Only meeting organizer can end the meeting')
+    )
   }
 
   let recordingUrl = null
