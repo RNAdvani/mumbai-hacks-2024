@@ -1,18 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { Plus, X, Edit2, Check, User } from 'lucide-react'
+import React, { useState } from 'react'
+import { Plus, X, Edit2, Check } from 'lucide-react'
 
 type Task = {
   id: number
   text: string
-  assignedTo: string
-  status: 'todo' | 'inProgress' | 'done'
-  createdAt: string
 }
 
 type Column = {
   id: number
   title: string
-  status: 'todo' | 'inProgress' | 'done'
   tasks: Task[]
 }
 
@@ -20,19 +16,19 @@ const initialColumns: Column[] = [
   {
     id: 1,
     title: 'To Do',
-    status: 'todo',
-    tasks: [],
+    tasks: [
+      { id: 1, text: 'Task 1' },
+      { id: 2, text: 'Task 2' },
+    ],
   },
   {
     id: 2,
     title: 'In Progress',
-    status: 'inProgress',
     tasks: [],
   },
   {
     id: 3,
     title: 'Done',
-    status: 'done',
     tasks: [],
   },
 ]
@@ -40,6 +36,7 @@ const initialColumns: Column[] = [
 const KanbanBoard = () => {
   const [columns, setColumns] = useState<Column[]>(initialColumns)
   const [draggedTask, setDraggedTask] = useState<Task | null>(null)
+  const [newTask, setNewTask] = useState('')
   const [editingTask, setEditingTask] = useState<{
     id: number
     text: string
@@ -47,66 +44,6 @@ const KanbanBoard = () => {
   const [draggedOverColumn, setDraggedOverColumn] = useState<number | null>(
     null
   )
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-
-  // Fetch tasks from backend
-  const fetchTasks = async () => {
-    try {
-      setIsLoading(true)
-      const response = await fetch('/api/tasks') // Replace with your API endpoint
-      if (!response.ok) throw new Error('Failed to fetch tasks')
-      const tasks: Task[] = await response.json()
-
-      // Distribute tasks to appropriate columns
-      const updatedColumns = initialColumns.map((column) => ({
-        ...column,
-        tasks: tasks.filter((task) => task.status === column.status),
-      }))
-
-      setColumns(updatedColumns)
-      setError(null)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch tasks')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  // Update task status in backend
-  const updateTaskStatus = async (
-    taskId: number,
-    newStatus: 'todo' | 'inProgress' | 'done'
-  ) => {
-    try {
-      const response = await fetch(`/api/tasks/${taskId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ status: newStatus }),
-      })
-
-      if (!response.ok) throw new Error('Failed to update task status')
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to update task status'
-      )
-      // Optionally refresh tasks to ensure UI is in sync with backend
-      fetchTasks()
-    }
-  }
-
-  // Initial fetch
-  useEffect(() => {
-    fetchTasks()
-  }, [])
-
-  // Fetch tasks periodically (e.g., every 30 seconds)
-  useEffect(() => {
-    const interval = setInterval(fetchTasks, 30000)
-    return () => clearInterval(interval)
-  }, [])
 
   const onDragStart = (task: Task) => {
     setDraggedTask(task)
@@ -121,84 +58,71 @@ const KanbanBoard = () => {
     setDraggedOverColumn(null)
   }
 
-  const onDrop = async (columnId: number) => {
+  const onDrop = (columnId: number) => {
     if (draggedTask) {
-      const targetColumn = columns.find((col) => col.id === columnId)
-      if (!targetColumn) return
-
-      try {
-        await updateTaskStatus(draggedTask.id, targetColumn.status)
-
-        setColumns((prevColumns) =>
-          prevColumns.map((column) => {
-            if (column.id === columnId) {
-              return {
-                ...column,
-                tasks: [
-                  ...column.tasks,
-                  { ...draggedTask, status: targetColumn.status },
-                ],
-              }
-            }
-            return {
-              ...column,
-              tasks: column.tasks.filter((task) => task.id !== draggedTask.id),
-            }
-          })
-        )
-      } catch (err) {
-        setError('Failed to move task. Please try again.')
-      }
-
+      setColumns((prevColumns) =>
+        prevColumns.map((column) => {
+          if (column.id === columnId) {
+            return { ...column, tasks: [...column.tasks, draggedTask] }
+          }
+          return {
+            ...column,
+            tasks: column.tasks.filter((task) => task.id !== draggedTask.id),
+          }
+        })
+      )
       setDraggedTask(null)
       setDraggedOverColumn(null)
     }
   }
 
-  const updateTask = async () => {
-    if (editingTask) {
-      try {
-        const response = await fetch(`/api/tasks/${editingTask.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ text: editingTask.text }),
-        })
-
-        if (!response.ok) throw new Error('Failed to update task')
-
-        setColumns((prevColumns) =>
-          prevColumns.map((column) => ({
-            ...column,
-            tasks: column.tasks.map((task) =>
-              task.id === editingTask.id
-                ? { ...task, text: editingTask.text }
-                : task
-            ),
-          }))
-        )
-      } catch (err) {
-        setError('Failed to update task. Please try again.')
+  const addTask = (columnId: number) => {
+    if (newTask.trim()) {
+      const newTaskObj = {
+        id:
+          Math.max(...columns.flatMap((col) => col.tasks.map((t) => t.id)), 0) +
+          1,
+        text: newTask.trim(),
       }
-      setEditingTask(null)
+
+      setColumns((prevColumns) =>
+        prevColumns.map((column) =>
+          column.id === columnId
+            ? { ...column, tasks: [...column.tasks, newTaskObj] }
+            : column
+        )
+      )
+      setNewTask('')
     }
   }
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-[#1A1B1E]">
-        <div className="text-white">Loading tasks...</div>
-      </div>
+  const deleteTask = (taskId: number) => {
+    setColumns((prevColumns) =>
+      prevColumns.map((column) => ({
+        ...column,
+        tasks: column.tasks.filter((task) => task.id !== taskId),
+      }))
     )
   }
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-[#1A1B1E]">
-        <div className="text-red-500">{error}</div>
-      </div>
-    )
+  const startEditingTask = (task: Task) => {
+    setEditingTask({ id: task.id, text: task.text })
+  }
+
+  const updateTask = () => {
+    if (editingTask) {
+      setColumns((prevColumns) =>
+        prevColumns.map((column) => ({
+          ...column,
+          tasks: column.tasks.map((task) =>
+            task.id === editingTask.id
+              ? { ...task, text: editingTask.text }
+              : task
+          ),
+        }))
+      )
+      setEditingTask(null)
+    }
   }
 
   return (
@@ -213,13 +137,25 @@ const KanbanBoard = () => {
           onDragLeave={onDragLeave}
           onDrop={() => onDrop(column.id)}
         >
-          <h2 className="text-xl font-bold mb-4 text-blue-400 flex items-center justify-between">
+          <h2 className="text-xl font-bold mb-4 text-blue-400">
             {column.title}
-            <span className="text-sm text-gray-400">
-              {column.tasks.length}{' '}
-              {column.tasks.length === 1 ? 'task' : 'tasks'}
-            </span>
           </h2>
+
+          <div className="flex mb-4">
+            <input
+              type="text"
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+              className="flex-1 px-3 py-2 bg-[#404146] text-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="New task..."
+            />
+            <button
+              onClick={() => addTask(column.id)}
+              className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <Plus size={20} />
+            </button>
+          </div>
 
           <div className="flex-1 space-y-2">
             {column.tasks.map((task) => (
@@ -227,7 +163,7 @@ const KanbanBoard = () => {
                 key={task.id}
                 draggable
                 onDragStart={() => onDragStart(task)}
-                className="bg-[#404146] p-3 rounded-md group flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-[#4a4b50] transition-colors"
+                className="bg-gray-700 p-3 rounded-md group flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-gray-600 transition-colors"
               >
                 {editingTask?.id === task.id ? (
                   <div className="flex-1 flex items-center gap-2">
@@ -237,7 +173,7 @@ const KanbanBoard = () => {
                       onChange={(e) =>
                         setEditingTask({ ...editingTask, text: e.target.value })
                       }
-                      className="flex-1 px-2 py-1 bg-[#27282c] text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-2 py-1 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       onClick={updateTask}
@@ -248,21 +184,19 @@ const KanbanBoard = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="flex flex-col flex-1">
-                      <span className="text-white">{task.text}</span>
-                      <div className="flex items-center gap-1 text-xs text-gray-400">
-                        <User size={12} />
-                        <span>{task.assignedTo}</span>
-                      </div>
-                    </div>
+                    <span className="text-white flex-1">{task.text}</span>
                     <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={() =>
-                          setEditingTask({ id: task.id, text: task.text })
-                        }
+                        onClick={() => startEditingTask(task)}
                         className="p-1 text-blue-400 hover:text-blue-300"
                       >
                         <Edit2 size={16} />
+                      </button>
+                      <button
+                        onClick={() => deleteTask(task.id)}
+                        className="p-1 text-red-400 hover:text-red-300"
+                      >
+                        <X size={16} />
                       </button>
                     </div>
                   </>

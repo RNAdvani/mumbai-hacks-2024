@@ -8,8 +8,6 @@ import sendEmail from '../helpers/sendEmail'
 import { joinTeammatesEmail } from '../html/join-teammates-email'
 import { TryCatch } from '../helpers/TryCatch'
 
-
-
 // @desc    add teammates to either organisation or a channel
 // @route   POST /api/v1/teammates
 // @access  Private
@@ -102,7 +100,10 @@ export async function createTeammates(
             if (existingUser) {
               // Check if existingUser is not part of coWorkers field before pushing
               const isUserAlreadyInCoWorkers =
-                !!organisationExist.coWorkers.find((coworker) => coworker.toString() === existingUser._id.toString())
+                !!organisationExist.coWorkers.find(
+                  (coworker) =>
+                    coworker.toString() === existingUser._id.toString()
+                )
 
               if (!isUserAlreadyInCoWorkers) {
                 organisation = await Organisation.findOneAndUpdate(
@@ -211,7 +212,7 @@ export async function createTeammates(
 // @desc    get a teammate of an organisation
 // @route   GET /api/v1/teammates
 // @access  Private
-export const getTeammate = TryCatch(async(req,res,next)=>{
+export const getTeammate = TryCatch(async (req, res, next) => {
   const coworkerId = req.params.id
   const coworker = await User.findById(coworkerId)
   if (!coworker) {
@@ -222,13 +223,15 @@ export const getTeammate = TryCatch(async(req,res,next)=>{
   return successResponse(res, coworker)
 })
 
-
-export const getTeammates = TryCatch(async(req,res,next)=>{
+export const getTeammates = TryCatch(async (req, res, next) => {
   const organisationId = req.params.id
-  const organisation = await Organisation.findById(organisationId).populate('coWorkers')
-  if(!organisation){
+  console.log(organisationId)
+  const organisation = await Organisation.findById(organisationId).populate(
+    'coWorkers'
+  )
+  if (!organisation) {
     return res.status(400).json({
-      name: 'Organisation not found',
+      name: 'Organisation not found and emememem',
     })
   }
   return successResponse(res, organisation.coWorkers)
