@@ -149,7 +149,7 @@ const Workspaces: NextPage = () => {
             <Stack>
               {organisations?.map((organisation: Data, index: number) => (
                 <Flex
-                  onClick={()=>{
+                  onClick={() => {
                     localStorage.setItem('organisationId', organisation?._id)
                   }}
                   pb="md"
@@ -169,14 +169,16 @@ const Workspaces: NextPage = () => {
                       color={getColorByIndex(index)}
                       radius="xl"
                     >
-                      {organisation.name[0].toUpperCase()}
+                      {organisation?.name
+                        ? organisation.name[0].toUpperCase()
+                        : ''}
                     </Avatar>
                     <Flex direction="column">
                       <Text c="white" transform="capitalize">
-                        {organisation.name}
+                        {organisation?.name}
                       </Text>
                       <Text size="xs" transform="capitalize">
-                        {organisation.coWorkers.length} members
+                        {organisation?.coWorkers.length} members
                       </Text>
                     </Flex>
                   </Flex>
