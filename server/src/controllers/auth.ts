@@ -84,7 +84,7 @@ export const register = TryCatch(async (
     await user.save()
     sendEmail(
       email,
-      'Slack confirmation code',
+      'NGENX confirmation code',
       verificationHtml(verificationToken)
     )
 
@@ -126,7 +126,7 @@ export const signin = TryCatch(async (
 
     sendEmail(
       email,
-      'Slack confirmation code',
+      'NGENX confirmation code',
       verificationHtml(verificationToken)
     )
 

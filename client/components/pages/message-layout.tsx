@@ -228,6 +228,8 @@ export default function MessageLayout({
             </Flex>
           )}
 
+          <Button onClick={()=>{window.location.href = `/meeting/create`}}>Schedule a meeting</Button>
+
           {selected?.isChannel && (
             <Paper radius="md" p="sm" px="md" withBorder>
               <Flex align="center">

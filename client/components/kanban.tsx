@@ -137,21 +137,21 @@ const KanbanBoard = () => {
           onDragLeave={onDragLeave}
           onDrop={() => onDrop(column.id)}
         >
-          <h2 className="text-xl font-bold mb-4 text-blue-400">
+          <h2 className="text-4xl text-center p-5 font-bold mb-4 text-blue-400">
             {column.title}
           </h2>
 
-          <div className="flex mb-4">
+          <div className="flex mb-8">
             <input
               type="text"
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
-              className="flex-1 px-3 py-2 bg-[#404146] text-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-4 bg-[#404146] text-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="New task..."
             />
             <button
               onClick={() => addTask(column.id)}
-              className="px-4 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-3 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <Plus size={20} />
             </button>

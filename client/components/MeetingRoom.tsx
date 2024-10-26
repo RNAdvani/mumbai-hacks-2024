@@ -18,7 +18,7 @@ interface MeetingRoomProps {
 
 const MeetingRoom: React.FC<MeetingRoomProps> = (props) => {
   return (
-    <div className="h-screen w-full bg-gray-100">
+    <div className="h-screen w-full bg-gray-900">
       <div className="p-4">
         <h1 className="text-xl font-bold mb-4">
           Meeting Room: {props.meetingId}
