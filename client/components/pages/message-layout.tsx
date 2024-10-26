@@ -37,6 +37,7 @@ const useStyles = createStyles((theme) => ({
 }))
 
 export default function MessageLayout({
+  id,
   type,
   messagesLoading,
 }: MessageLayoutProps) {
@@ -282,6 +283,7 @@ export default function MessageLayout({
             messagesLoading={messagesLoading}
             type={type}
             open={open}
+            id={id as string}
           />
         )}
 

@@ -11,6 +11,8 @@ export default function Conversation({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const { id } = router.query
+  console.log(id)
   const {
     data: organisationData,
     channel,
@@ -31,6 +33,7 @@ export default function Conversation({
       <BackgroundImage h="100vh" src="/bg-chat.png">
         {organisationData && (
           <MessageLayout
+            id={id as string}
             messagesLoading={
               channel
                 ? channelMessagesQuery.isLoading

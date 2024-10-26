@@ -5,6 +5,7 @@ export interface DefaultLayoutProps {
   thread: React.ReactNode | undefined
 }
 export interface MessageLayoutProps {
+  id: String
   type: 'channel' | 'conversation'
   messagesLoading: boolean
 }
@@ -24,6 +25,7 @@ export interface MessageProps {
   isLoading?: boolean
   type?: 'channel' | 'conversation'
   isThread?: boolean
+  id: string
   open?: () => void
 }
 

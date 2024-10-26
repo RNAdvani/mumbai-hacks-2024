@@ -23,6 +23,8 @@ import MessageList from './message-list'
 import { useRouter } from 'next/router'
 import { GoMegaphone } from 'react-icons/go'
 import { Message as IMessage, MessageProps, User } from '../utils/interfaces'
+import Button from './button'
+import axios from '../services/axios'
 
 const Message = ({
   messagesLoading,
@@ -30,6 +32,7 @@ const Message = ({
   type,
   isThread = false,
   open,
+  id,
 }: MessageProps) => {
   const router = useRouter()
   const { threadId } = router.query
@@ -53,10 +56,34 @@ const Message = ({
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty()
   )
+  const [summary, setSummary] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
   const stackRef = React.useRef<HTMLDivElement | null>(null)
 
   const handleChange = (newEditorState: EditorState) => {
     setEditorState(newEditorState)
+  }
+
+  const handleSummary = async () => {
+    const conversationId = localStorage.getItem('conversa tionId')
+    setLoading(true)
+    try {
+      const response = await axios.post(`/conversations/summarize/${id}`)
+      setSummary(response.data.summary) // Assuming the response has a 'summary' field
+      notifications.show({
+        title: 'Success',
+        message: 'Summary fetched successfully!',
+        color: 'green',
+      })
+    } catch (error) {
+      notifications.show({
+        title: 'Error',
+        message: 'There was an error fetching the summary. Please try again.',
+        color: 'red',
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleReturn = (
@@ -458,6 +485,20 @@ const Message = ({
               },
             }}
           />
+          <div>
+            <Button
+              onClick={handleSummary}
+              className="flex items-center text-white-500 mt-4"
+              disabled={loading}
+            >
+              {loading ? 'Loading...' : 'Fetch Summary'}
+            </Button>
+            {summary && (
+              <div className="mt-4 p-4 border border-gray-300 rounded-lg">
+                <Text>{summary}</Text>
+              </div>
+            )}
+          </div>{' '}
         </Paper>
       )}
     </>
