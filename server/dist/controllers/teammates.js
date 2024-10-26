@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTeammate = exports.createTeammates = void 0;
+exports.getTeammates = exports.getTeammate = exports.createTeammates = void 0;
 const tslib_1 = require("tslib");
 const organisation_1 = tslib_1.__importDefault(require("../models/organisation"));
 const conversation_1 = tslib_1.__importDefault(require("../models/conversation"));
@@ -9,6 +9,7 @@ const channel_1 = tslib_1.__importDefault(require("../models/channel"));
 const user_1 = tslib_1.__importDefault(require("../models/user"));
 const sendEmail_1 = tslib_1.__importDefault(require("../helpers/sendEmail"));
 const join_teammates_email_1 = require("../html/join-teammates-email");
+const TryCatch_1 = require("../helpers/TryCatch");
 // @desc    add teammates to either organisation or a channel
 // @route   POST /api/v1/teammates
 // @access  Private
@@ -146,23 +147,24 @@ exports.createTeammates = createTeammates;
 // @desc    get a teammate of an organisation
 // @route   GET /api/v1/teammates
 // @access  Private
-function getTeammate(req, res, next) {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        try {
-            const coworkerId = req.params.id;
-            const coworker = yield user_1.default.findById(coworkerId);
-            // console.log(coworker);
-            if (!coworker) {
-                return res.status(400).json({
-                    name: 'Coworker not found',
-                });
-            }
-            return (0, successResponse_1.default)(res, coworker);
-        }
-        catch (error) {
-            next(error);
-        }
-    });
-}
-exports.getTeammate = getTeammate;
+exports.getTeammate = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    const coworkerId = req.params.id;
+    const coworker = yield user_1.default.findById(coworkerId);
+    if (!coworker) {
+        return res.status(400).json({
+            name: 'Coworker not found',
+        });
+    }
+    return (0, successResponse_1.default)(res, coworker);
+}));
+exports.getTeammates = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    const organisationId = req.params.id;
+    const organisation = yield organisation_1.default.findById(organisationId).populate('coWorkers');
+    if (!organisation) {
+        return res.status(400).json({
+            name: 'Organisation not found',
+        });
+    }
+    return (0, successResponse_1.default)(res, organisation.coWorkers);
+}));
 //# sourceMappingURL=teammates.js.map

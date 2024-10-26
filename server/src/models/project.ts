@@ -1,10 +1,10 @@
 import mongoose from "mongoose"
 
-interface ProjectSchemaType {
+interface ProjectSchemaType extends Document {
     _id: mongoose.Schema.Types.ObjectId
     name: string
     description: string
-    manager: mongoose.Schema.Types.ObjectId
+    manager: mongoose.Schema.Types.ObjectId 
     organisation: mongoose.Schema.Types.ObjectId
     status: 'planning' | 'active' | 'completed' | 'on-hold'
     priority: 'low' | 'medium' | 'high'
@@ -100,4 +100,4 @@ interface ProjectSchemaType {
     next()
   })
 
-  export const Project = mongoose.models.Project || mongoose.model('Project', projectSchema)
+export const Project = mongoose.model('Project', projectSchema)

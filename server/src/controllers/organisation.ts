@@ -4,6 +4,7 @@ import successResponse from '../helpers/successResponse'
 import Channel from '../models/channel'
 import Conversations from '../models/conversation'
 import { UserSchemaType } from 'src/models/user'
+import { User } from 'src/types'
 
 // @desc    get organisation
 // @route   GET /api/v1/organisation/:id
@@ -22,7 +23,7 @@ export async function getOrganisation(
       ])
 
       if (!organisation) {
-        res.status(400, {
+        res.status(400).json({
           name: 'no organisation found',
         })
       }
@@ -67,16 +68,16 @@ export async function getOrganisation(
 
       // Check if the authenticated user is a co-worker of the organisation
       const currentUserIsCoWorker = organisation.coWorkers.some(
-        (coworker: UserSchemaType) => coworker._id.toString() === req.user.id
+        (coworker: User) => coworker._id.toString() === req.user.id
       )
 
       // Replace the profile object with the corresponding co-worker's values
-      let profile: UserSchemaType
+      let profile: User | null = null
       if (currentUserIsCoWorker) {
         const currentUser = organisation.coWorkers.find(
-          (coworker: UserSchemaType) => coworker._id.toString() === req.user.id
+          (coworker: User) => coworker._id.toString() === req.user.id
         )
-        profile = currentUser
+        profile = currentUser as User
       }
 
       // Update the coWorkers array in the organisation object

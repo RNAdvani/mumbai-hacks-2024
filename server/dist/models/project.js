@@ -81,5 +81,5 @@ projectSchema.pre('save', function (next) {
         next();
     });
 });
-exports.Project = mongoose_1.default.models.Project || mongoose_1.default.model('Project', projectSchema);
+exports.Project = mongoose_1.default.model('Project', projectSchema);
 //# sourceMappingURL=project.js.map

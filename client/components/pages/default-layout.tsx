@@ -13,6 +13,7 @@ import {
   Box,
   Modal,
   Flex,
+  Card,
 } from '@mantine/core'
 import { getColorByIndex } from '../../utils/helpers'
 import { TbHash } from 'react-icons/tb'
@@ -25,7 +26,7 @@ import Input from '../input'
 import Button from '../button'
 import { useAppContext } from '../../providers/app-provider'
 import { useForm } from '@mantine/form'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import axios from '../../services/axios'
 import { notifications } from '@mantine/notifications'
 import TagInputs from '../tags-input'
@@ -37,6 +38,8 @@ import {
   Conversation,
   DefaultLayoutProps,
 } from '../../utils/interfaces'
+import { Project } from '../../types'
+import mongoose from 'mongoose'
 
 const useStyles = createStyles((theme) => ({
   section: {
@@ -175,6 +178,7 @@ export default function DefaultLayout({
   }
 
   const [popupWindow, setPopupWindow] = React.useState(false)
+  const [projects, setProjects] = React.useState<Project[]>([])
   return (
     <>
       <Modal
@@ -405,6 +409,19 @@ export default function DefaultLayout({
               ))}
             </Navbar.Section>
 
+            <Stack spacing="md">
+      {projects?.map((project) => (
+        <Card shadow="sm" padding="sm" key={project._id.toString()}>
+          <Flex align="center" justify="space-between">
+            <Text weight="bold">{project.name}</Text>
+            <Button onClick={()=>{
+              router.push(`/projects/${project._id}`)
+            }}>View Tasks</Button>
+          </Flex>
+        </Card>
+      ))}
+    </Stack>
+
             {selected?.isConversation && !selected?.isSelf && (
               <Huddle
                 // selected={selected}
@@ -417,6 +434,8 @@ export default function DefaultLayout({
             )}
           </Navbar>
         </Grid.Col>
+
+        
 
         <Grid.Col span="auto" p="0">
           {children}
@@ -433,6 +452,7 @@ export default function DefaultLayout({
           </Grid.Col>
         )}
       </Grid>
+      
     </>
   )
 }

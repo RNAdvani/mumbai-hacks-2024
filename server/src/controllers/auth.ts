@@ -5,6 +5,8 @@ import crypto from 'crypto'
 import { verificationHtml } from '../html/confirmation-code-email'
 import passport from 'passport'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
+import { ErrorHandler } from '../middleware/errorResponse'
+import { TryCatch } from '../helpers/TryCatch'
 
 // Configure Google OAuth strategy
 passport.use(
@@ -41,13 +43,17 @@ passport.serializeUser((user, done) => {
 })
 
 passport.deserializeUser((user, done) => {
-  done(null, user)
+  done(null, user as {
+    id: string
+    username: string
+    email: string
+  })
 })
 
 // @desc    Register user
 // @route   POST /api/v1/auth/register
 // @access  Public
-export const register = async (
+export const register = TryCatch(async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -55,12 +61,7 @@ export const register = async (
   const { username, email } = req.body
 
   if (!email) {
-    return res.status(400).json({
-      success: false,
-      data: {
-        name: 'Please provide your email address',
-      },
-    })
+    return next(new ErrorHandler(400, 'Please provide your email address'))
   }
 
   const emailExist = await User.findOne({ email })
@@ -78,7 +79,7 @@ export const register = async (
     username,
     email,
   })
-  try {
+ 
     const verificationToken = user.getVerificationCode()
     await user.save()
     sendEmail(
@@ -87,24 +88,18 @@ export const register = async (
       verificationHtml(verificationToken)
     )
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       data: {
         name: 'Verification token sent to email',
       },
     })
-  } catch (err) {
-    user.loginVerificationCode = undefined
-    user.loginVerificationCodeExpires = undefined
-    await user.save({ validateBeforeSave: false })
-    next(err)
-  }
-}
-
+    
+})
 // @desc    Signin user
 // @route   POST /api/v1/auth/signin
 // @access  Public
-export const signin = async (
+export const signin = TryCatch(async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -112,12 +107,7 @@ export const signin = async (
   const { email } = req.body
 
   if (!email) {
-    return res.status(400).json({
-      success: false,
-      data: {
-        name: 'Please provide your email address',
-      },
-    })
+    return next(new ErrorHandler(400, 'Please provide your email address'))
   }
 
   const user = await User.findOne({ email })
@@ -131,7 +121,6 @@ export const signin = async (
     })
   }
 
-  try {
     const verificationToken = user.getVerificationCode()
     await user.save()
 
@@ -147,30 +136,19 @@ export const signin = async (
         name: 'Verification token sent to email',
       },
     })
-  } catch (err) {
-    user.loginVerificationCode = undefined
-    user.loginVerificationCodeExpires = undefined
-    await user.save({ validateBeforeSave: false })
-    next(err)
-  }
-}
+  
+})
 
 // @desc    Verify user
 // @route   POST /api/v1/auth/verify
 // @access  Public
-export const verify = async (
+export const verify = TryCatch(async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  try {
     if (!req.body.loginVerificationCode) {
-      return res.status(400).json({
-        success: false,
-        data: {
-          name: 'Please provide verification token',
-        },
-      })
+      return next(new ErrorHandler(400, 'Please provide a verification token'))
     }
     // Get hashed token
     const loginVerificationCode = crypto
@@ -184,15 +162,10 @@ export const verify = async (
     })
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        data: {
-          name: 'Invalid verification token',
-        },
-      })
+      return next(new ErrorHandler(400, 'Invalid verification token'))
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
         username: user.username,
@@ -201,13 +174,8 @@ export const verify = async (
       },
     })
 
-    user.loginVerificationCode = undefined
-    user.loginVerificationCodeExpires = undefined
-    await user.save({ validateBeforeSave: false })
-  } catch (err) {
-    next(err)
-  }
-}
+  } 
+)
 
 // @desc    Google OAuth Callback
 // @route   GET /auth/google/callback

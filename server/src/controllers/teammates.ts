@@ -6,6 +6,9 @@ import Channel, { ChannelSchemaType } from '../models/channel'
 import User from '../models/user'
 import sendEmail from '../helpers/sendEmail'
 import { joinTeammatesEmail } from '../html/join-teammates-email'
+import { TryCatch } from '../helpers/TryCatch'
+
+
 
 // @desc    add teammates to either organisation or a channel
 // @route   POST /api/v1/teammates
@@ -208,23 +211,25 @@ export async function createTeammates(
 // @desc    get a teammate of an organisation
 // @route   GET /api/v1/teammates
 // @access  Private
-export async function getTeammate(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const coworkerId = req.params.id
-    const coworker = await User.findById(coworkerId)
-    // console.log(coworker);
-    if (!coworker) {
-      return res.status(400).json({
-        name: 'Coworker not found',
-      })
-    }
-
-    return successResponse(res, coworker)
-  } catch (error) {
-    next(error)
+export const getTeammate = TryCatch(async(req,res,next)=>{
+  const coworkerId = req.params.id
+  const coworker = await User.findById(coworkerId)
+  if (!coworker) {
+    return res.status(400).json({
+      name: 'Coworker not found',
+    })
   }
-}
+  return successResponse(res, coworker)
+})
+
+
+export const getTeammates = TryCatch(async(req,res,next)=>{
+  const organisationId = req.params.id
+  const organisation = await Organisation.findById(organisationId).populate('coWorkers')
+  if(!organisation){
+    return res.status(400).json({
+      name: 'Organisation not found',
+    })
+  }
+  return successResponse(res, organisation.coWorkers)
+})

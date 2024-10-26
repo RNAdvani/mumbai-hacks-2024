@@ -7,7 +7,7 @@ const router = express.Router()
 router.post('/register', register)
 router.post('/signin', signin)
 router.post('/verify', verify)
-router.get('/google', passport.authenticate('google', ['profile', 'email']))
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }))
 
 router.get('/google/callback', googleCallback)
 

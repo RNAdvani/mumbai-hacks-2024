@@ -149,6 +149,9 @@ const Workspaces: NextPage = () => {
             <Stack>
               {organisations?.map((organisation: Data, index: number) => (
                 <Flex
+                  onClick={()=>{
+                    localStorage.setItem('organisationId', organisation?._id)
+                  }}
                   pb="md"
                   align="center"
                   key={organisation?._id}

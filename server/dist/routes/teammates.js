@@ -7,5 +7,6 @@ const protect_1 = require("../middleware/protect");
 const router = express_1.default.Router();
 router.get('/:id', protect_1.protect, teammates_1.getTeammate);
 router.post('/', protect_1.protect, teammates_1.createTeammates);
+router.get("/employees/:id", protect_1.protect, teammates_1.getTeammates);
 exports.default = router;
 //# sourceMappingURL=teammates.js.map
