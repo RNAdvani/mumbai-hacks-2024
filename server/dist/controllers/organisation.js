@@ -19,7 +19,7 @@ function getOrganisation(req, res, next) {
                     'owner',
                 ]);
                 if (!organisation) {
-                    res.status(400, {
+                    res.status(400).json({
                         name: 'no organisation found',
                     });
                 }
@@ -44,7 +44,7 @@ function getOrganisation(req, res, next) {
                 // Check if the authenticated user is a co-worker of the organisation
                 const currentUserIsCoWorker = organisation.coWorkers.some((coworker) => coworker._id.toString() === req.user.id);
                 // Replace the profile object with the corresponding co-worker's values
-                let profile;
+                let profile = null;
                 if (currentUserIsCoWorker) {
                     const currentUser = organisation.coWorkers.find((coworker) => coworker._id.toString() === req.user.id);
                     profile = currentUser;

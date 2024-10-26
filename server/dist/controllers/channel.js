@@ -4,6 +4,8 @@ exports.updateChannel = exports.getChannel = exports.getChannels = exports.creat
 const tslib_1 = require("tslib");
 const channel_1 = tslib_1.__importDefault(require("../models/channel"));
 const successResponse_1 = tslib_1.__importDefault(require("../helpers/successResponse"));
+const TryCatch_1 = require("../helpers/TryCatch");
+const errorResponse_1 = require("../middleware/errorResponse");
 // @desc    create channel
 // @route   POST /api/v1/channel/create
 // @access  Private
@@ -43,46 +45,26 @@ function getChannels(req, res, next) {
     });
 }
 exports.getChannels = getChannels;
-function getChannel(req, res, next) {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        try {
-            const id = req.params.id;
-            const channel = yield channel_1.default.findById(id)
-                .populate('collaborators')
-                .sort({ _id: -1 });
-            if (!channel) {
-                return res.status(400).json({
-                    name: 'not found',
-                });
-            }
-            const updatedChannel = Object.assign(Object.assign({}, channel.toObject()), { isChannel: true });
-            (0, successResponse_1.default)(res, updatedChannel);
-        }
-        catch (error) {
-            next(error);
-        }
+exports.getChannel = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const channel = yield channel_1.default.findById(id)
+        .populate('collaborators')
+        .sort({ _id: -1 });
+    if (!channel) {
+        return next(new errorResponse_1.ErrorHandler(404, 'Channel not found'));
+    }
+    const updatedChannel = Object.assign(Object.assign({}, channel.toObject()), { isChannel: true });
+    (0, successResponse_1.default)(res, updatedChannel);
+}));
+exports.updateChannel = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    const channel = yield channel_1.default.findById(id);
+    if (!channel) {
+        return next(new errorResponse_1.ErrorHandler(404, 'Channel not found'));
+    }
+    const updatedChannel = yield channel_1.default.findByIdAndUpdate(id, { $addToSet: { collaborators: req.body.userId } }, {
+        new: true,
     });
-}
-exports.getChannel = getChannel;
-function updateChannel(req, res, next) {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        try {
-            const id = req.params.id;
-            const channel = yield channel_1.default.findById(id);
-            if (!channel) {
-                return res.status(400).json({
-                    name: 'not found',
-                });
-            }
-            const updatedChannel = yield channel_1.default.findByIdAndUpdate(id, { $addToSet: { collaborators: req.body.userId } }, {
-                new: true,
-            });
-            (0, successResponse_1.default)(res, updatedChannel);
-        }
-        catch (error) {
-            next(error);
-        }
-    });
-}
-exports.updateChannel = updateChannel;
+    (0, successResponse_1.default)(res, updatedChannel);
+}));
 //# sourceMappingURL=channel.js.map

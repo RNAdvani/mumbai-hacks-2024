@@ -1,11 +1,11 @@
 import mongoose from 'mongoose'
-import { UserSchemaType } from './user'
+import { User } from 'src/types'
 
 export interface OrganisationSchemaType {
-  owner: mongoose.Schema.Types.ObjectId
+  owner: mongoose.Schema.Types.ObjectId | User
   name: string
   hobbies: string[]
-  coWorkers: mongoose.Schema.Types.ObjectId[] & UserSchemaType[]
+  coWorkers: mongoose.Schema.Types.ObjectId[] & User[]
   generateJoinLink: () => string
   joinLink: string
   url: string,

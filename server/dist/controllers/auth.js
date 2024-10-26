@@ -8,6 +8,8 @@ const crypto_1 = tslib_1.__importDefault(require("crypto"));
 const confirmation_code_email_1 = require("../html/confirmation-code-email");
 const passport_1 = tslib_1.__importDefault(require("passport"));
 const passport_google_oauth20_1 = require("passport-google-oauth20");
+const errorResponse_1 = require("../middleware/errorResponse");
+const TryCatch_1 = require("../helpers/TryCatch");
 // Configure Google OAuth strategy
 passport_1.default.use(new passport_google_oauth20_1.Strategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -41,15 +43,10 @@ passport_1.default.deserializeUser((user, done) => {
 // @desc    Register user
 // @route   POST /api/v1/auth/register
 // @access  Public
-const register = (req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+exports.register = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const { username, email } = req.body;
     if (!email) {
-        return res.status(400).json({
-            success: false,
-            data: {
-                name: 'Please provide your email address',
-            },
-        });
+        return next(new errorResponse_1.ErrorHandler(400, 'Please provide your email address'));
     }
     const emailExist = yield user_1.default.findOne({ email });
     if (emailExist) {
@@ -64,37 +61,23 @@ const register = (req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, f
         username,
         email,
     });
-    try {
-        const verificationToken = user.getVerificationCode();
-        yield user.save();
-        (0, sendEmail_1.default)(email, 'Slack confirmation code', (0, confirmation_code_email_1.verificationHtml)(verificationToken));
-        res.status(201).json({
-            success: true,
-            data: {
-                name: 'Verification token sent to email',
-            },
-        });
-    }
-    catch (err) {
-        user.loginVerificationCode = undefined;
-        user.loginVerificationCodeExpires = undefined;
-        yield user.save({ validateBeforeSave: false });
-        next(err);
-    }
-});
-exports.register = register;
+    const verificationToken = user.getVerificationCode();
+    yield user.save();
+    (0, sendEmail_1.default)(email, 'Slack confirmation code', (0, confirmation_code_email_1.verificationHtml)(verificationToken));
+    return res.status(201).json({
+        success: true,
+        data: {
+            name: 'Verification token sent to email',
+        },
+    });
+}));
 // @desc    Signin user
 // @route   POST /api/v1/auth/signin
 // @access  Public
-const signin = (req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+exports.signin = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const { email } = req.body;
     if (!email) {
-        return res.status(400).json({
-            success: false,
-            data: {
-                name: 'Please provide your email address',
-            },
-        });
+        return next(new errorResponse_1.ErrorHandler(400, 'Please provide your email address'));
     }
     const user = yield user_1.default.findOne({ email });
     if (!user) {
@@ -105,72 +88,44 @@ const signin = (req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, fun
             },
         });
     }
-    try {
-        const verificationToken = user.getVerificationCode();
-        yield user.save();
-        (0, sendEmail_1.default)(email, 'Slack confirmation code', (0, confirmation_code_email_1.verificationHtml)(verificationToken));
-        res.status(201).json({
-            success: true,
-            data: {
-                name: 'Verification token sent to email',
-            },
-        });
-    }
-    catch (err) {
-        user.loginVerificationCode = undefined;
-        user.loginVerificationCodeExpires = undefined;
-        yield user.save({ validateBeforeSave: false });
-        next(err);
-    }
-});
-exports.signin = signin;
+    const verificationToken = user.getVerificationCode();
+    yield user.save();
+    (0, sendEmail_1.default)(email, 'Slack confirmation code', (0, confirmation_code_email_1.verificationHtml)(verificationToken));
+    res.status(201).json({
+        success: true,
+        data: {
+            name: 'Verification token sent to email',
+        },
+    });
+}));
 // @desc    Verify user
 // @route   POST /api/v1/auth/verify
 // @access  Public
-const verify = (req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-    try {
-        if (!req.body.loginVerificationCode) {
-            return res.status(400).json({
-                success: false,
-                data: {
-                    name: 'Please provide verification token',
-                },
-            });
-        }
-        // Get hashed token
-        const loginVerificationCode = crypto_1.default
-            .createHash('sha256')
-            .update(req.body.loginVerificationCode)
-            .digest('hex');
-        const user = yield user_1.default.findOne({
-            loginVerificationCode,
-            loginVerificationCodeExpires: { $gt: Date.now() },
-        });
-        if (!user) {
-            return res.status(400).json({
-                success: false,
-                data: {
-                    name: 'Invalid verification token',
-                },
-            });
-        }
-        res.status(200).json({
-            success: true,
-            data: {
-                username: user.username,
-                email: user.email,
-                token: user.getSignedJwtToken(),
-            },
-        });
-        user.loginVerificationCode = undefined;
-        user.loginVerificationCodeExpires = undefined;
-        yield user.save({ validateBeforeSave: false });
+exports.verify = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    if (!req.body.loginVerificationCode) {
+        return next(new errorResponse_1.ErrorHandler(400, 'Please provide a verification token'));
     }
-    catch (err) {
-        next(err);
+    // Get hashed token
+    const loginVerificationCode = crypto_1.default
+        .createHash('sha256')
+        .update(req.body.loginVerificationCode)
+        .digest('hex');
+    const user = yield user_1.default.findOne({
+        loginVerificationCode,
+        loginVerificationCodeExpires: { $gt: Date.now() },
+    });
+    if (!user) {
+        return next(new errorResponse_1.ErrorHandler(400, 'Invalid verification token'));
     }
-});
-exports.verify = verify;
+    return res.status(200).json({
+        success: true,
+        data: {
+            username: user.username,
+            email: user.email,
+            token: user.getSignedJwtToken(),
+        },
+    });
+}));
 // @desc    Google OAuth Callback
 // @route   GET /auth/google/callback
 // @access  Public

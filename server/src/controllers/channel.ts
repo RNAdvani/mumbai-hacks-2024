@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import Channel from '../models/channel'
 import successResponse from '../helpers/successResponse'
+import { TryCatch } from '../helpers/TryCatch'
+import { ErrorHandler } from '../middleware/errorResponse'
 
 // @desc    create channel
 // @route   POST /api/v1/channel/create
@@ -44,46 +46,29 @@ export async function getChannels(
   }
 }
 
-export async function getChannel(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const id = req.params.id
-    const channel = await Channel.findById(id)
-      .populate('collaborators')
-      .sort({ _id: -1 })
+export const getChannel = TryCatch(async(req,res,next)=>{
+  const id = req.params.id
+  const channel = await Channel.findById(id)
+    .populate('collaborators')
+    .sort({ _id: -1 })
 
-    if (!channel) {
-      return res.status(400).json({
-        name: 'not found',
-      })
-    }
-
-    const updatedChannel = {
-      ...channel.toObject(),
-      isChannel: true,
-    }
-
-    successResponse(res, updatedChannel)
-  } catch (error) {
-    next(error)
+  if (!channel) {
+    return next(new ErrorHandler(404, 'Channel not found'))
   }
-}
 
-export async function updateChannel(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
-  try {
-    const id = req.params.id
+  const updatedChannel = {
+    ...channel.toObject(),
+    isChannel: true,
+  }
+
+  successResponse(res, updatedChannel)
+})
+
+export const updateChannel = TryCatch(async(req,res,next)=>{
+  const id = req.params.id
     const channel = await Channel.findById(id)
     if (!channel) {
-      return res.status(400).json({
-        name: 'not found',
-      })
+      return next(new ErrorHandler(404, 'Channel not found'))
     }
 
     const updatedChannel = await Channel.findByIdAndUpdate(
@@ -95,7 +80,4 @@ export async function updateChannel(
     )
 
     successResponse(res, updatedChannel)
-  } catch (error) {
-    next(error)
-  }
-}
+  })
