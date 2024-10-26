@@ -117,7 +117,7 @@ const Register: NextPage = () => {
                 </MantineButton>
                 <Stack spacing="xs" mt="lg">
                   <Text size="xs" align="center">
-                    Already using Slack?
+                    Already using NGENX?
                   </Text>
                   <Anchor size="xs" align="center" href="/signin">
                     Sign in to an existing workspace

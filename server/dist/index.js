@@ -32,6 +32,7 @@ const passport_1 = tslib_1.__importDefault(require("passport"));
 const cookie_session_1 = tslib_1.__importDefault(require("cookie-session"));
 const project_1 = require("./routes/project");
 const meeting_1 = tslib_1.__importDefault(require("./routes/meeting"));
+const tasks_1 = require("./routes/tasks");
 const app = (0, express_1.default)();
 const server = http_1.default.createServer(app);
 const io = new socket_io_1.Server(server, {
@@ -339,6 +340,7 @@ app.use('/api/v1/organisation', organisation_1.default);
 app.use('/api/v1/conversations', conversations_1.default);
 app.use("/api/v1/projects", project_1.projectRoutes);
 app.use('/api/v1/meetings', meeting_1.default);
+app.use("/api/v1/tasks", tasks_1.taskRoutes);
 // error handler
 app.use(errorResponse_1.default);
 // Start the server

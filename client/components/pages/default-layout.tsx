@@ -18,7 +18,7 @@ import {
 import { getColorByIndex } from '../../utils/helpers'
 import { TbHash } from 'react-icons/tb'
 import { HiPlus } from 'react-icons/hi'
-import React from 'react'
+import React, { useEffect } from 'react'
 import AccountSwitcher from '../account-switcher'
 import { useRouter } from 'next/router'
 import { useDisclosure } from '@mantine/hooks'
@@ -40,6 +40,7 @@ import {
 } from '../../utils/interfaces'
 import { Project } from '../../types'
 import mongoose from 'mongoose'
+import Link from 'next/link'
 
 const useStyles = createStyles((theme) => ({
   section: {
@@ -179,6 +180,22 @@ export default function DefaultLayout({
 
   const [popupWindow, setPopupWindow] = React.useState(false)
   const [projects, setProjects] = React.useState<Project[]>([])
+
+  const handleGetProjects = async (organisationId:string) => {
+    try {
+      const res = await axios.post(`/projects/get/${organisationId}`)
+      console.log(res.data.data)
+      setProjects(res?.data.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  useEffect(()=>{
+    const id = localStorage.getItem('organisationId')
+    handleGetProjects(id!)
+  },[])
+
   return (
     <>
       <Modal
@@ -409,18 +426,23 @@ export default function DefaultLayout({
               ))}
             </Navbar.Section>
 
-            <Stack spacing="md">
+            <Stack spacing="md" className='p-4'>
       {projects?.map((project) => (
         <Card shadow="sm" padding="sm" key={project._id.toString()}>
           <Flex align="center" justify="space-between">
             <Text weight="bold">{project.name}</Text>
             <Button onClick={()=>{
-              router.push(`/projects/${project._id}`)
+              router.push(`/kanban/${project._id}`)
             }}>View Tasks</Button>
           </Flex>
         </Card>
       ))}
     </Stack>
+
+      <div className='flex justify-center w-full items-center'>
+        
+    <Link href="/project/create" className='border w-fit p-2 bg-white text-black rounded-md'>Create Project</Link>
+      </div>
 
             {selected?.isConversation && !selected?.isSelf && (
               <Huddle

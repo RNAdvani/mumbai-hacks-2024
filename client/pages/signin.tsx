@@ -56,7 +56,7 @@ const Signin: NextPage = () => {
         <Flex direction="column" align="center">
           <SlackLogo />
           <Text fz="3xl" fw={600} mt="3xl" c="white">
-            Sign in to Slack
+            Sign in to NGENX
           </Text>
           <Text fz="sm" mt="xs">
             We suggest using the{' '}
@@ -117,7 +117,7 @@ const Signin: NextPage = () => {
                 </MantineButton>
                 <Stack spacing="xs" mt="lg">
                   <Text size="xs" align="center">
-                    New to Slack?
+                    New to NGENX?
                   </Text>
                   <Anchor size="xs" align="center" href="/register">
                     Create an account

@@ -29,7 +29,7 @@ const JoinMeeting = () => {
     <div className="flex flex-col">
       <button
         onClick={handleJoinMeeting}
-        className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+        className="bg-blue-600 text-white p-5 rounded-xl text-3xl hover:bg-blue-700"
       >
         Join Meeting
       </button>

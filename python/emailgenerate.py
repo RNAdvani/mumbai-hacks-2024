@@ -1,12 +1,16 @@
+from flask import Flask, request, jsonify
 from langchain_community.llms import Ollama
+from flask_cors import CORS 
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 
+app = Flask(__name__)
+CORS(app)
+
 def create_email_generator():
-    # Initialize Ollama with specified model
-    llm = Ollama(model="mistral")  # You can change the model as needed
+    """Initialize and return the email generation chain"""
+    llm = Ollama(model="mistral")
     
-    # Create a prompt template for email generation
     email_template = """
     Write a professional email with the following requirements:
     
@@ -24,48 +28,81 @@ def create_email_generator():
         template=email_template
     )
     
-    # Create the LLMChain
-    email_chain = LLMChain(llm=llm, prompt=prompt)
-    
-    return email_chain
+    return LLMChain(llm=llm, prompt=prompt)
 
-def generate_email(chain, email_details):
+# Initialize the email generator chain
+email_chain = create_email_generator()
+
+@app.route('/health', methods=['GET'])
+def health_check():
+    """Basic health check endpoint"""
+    return jsonify({
+        'status': 'healthy',
+        'message': 'Email generator API is running'
+    })
+
+@app.route('/generate-email', methods=['POST'])
+def generate_email():
     """
-    Generate email based on provided details
+    Generate an email based on provided parameters
+    
+    Expected JSON body:
+    {
+        "subject": "Meeting Follow-up",
+        "recipient": "Marketing Team",
+        "purpose": "Summarize meeting outcomes",
+        "tone": "professional",
+        "context": "Weekly marketing sync discussion"
+    }
     """
     try:
-        response = chain.run(
-            subject=email_details['subject'],
-            recipient=email_details['recipient'],
-            purpose=email_details['purpose'],
-            tone=email_details['tone'],
-            context=email_details['context']
+        # Validate request
+        if not request.is_json:
+            return jsonify({
+                'error': 'Request must be JSON'
+            }), 400
+            
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['subject', 'recipient', 'purpose', 'tone', 'context']
+        missing_fields = [field for field in required_fields if field not in data]
+        
+        if missing_fields:
+            return jsonify({
+                'error': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+            
+        # Generate email
+        response = email_chain.run(
+            subject=data['subject'],
+            recipient=data['recipient'],
+            purpose=data['purpose'],
+            tone=data['tone'],
+            context=data['context']
         )
-        return response
+        
+        return jsonify({
+            'status': 'success',
+            'email_draft': response
+        })
+        
     except Exception as e:
-        return f"Error generating email: {str(e)}"
+        return jsonify({
+            'error': f'Error generating email: {str(e)}'
+        }), 500
 
-def main():
-    # Initialize the email generator
-    email_chain = create_email_generator()
-    
-    # Get user input
-    print("\n=== Email Draft Generator ===")
-    email_details = {
-        'subject': input("Enter email subject: "),
-        'recipient': input("Enter recipient (e.g., 'Marketing Team', 'Client'): "),
-        'purpose': input("What's the purpose of this email? "),
-        'tone': input("Desired tone (e.g., formal, friendly, professional): "),
-        'context': input("Any additional context or specific points to include: ")
-    }
-    
-    # Generate the email
-    print("\nGenerating email draft...\n")
-    email_draft = generate_email(email_chain, email_details)
-    
-    print("=== Generated Email Draft ===")
-    print(email_draft)
-    print("===========================")
+@app.errorhandler(404)
+def not_found(error):
+    return jsonify({
+        'error': 'Endpoint not found'
+    }), 404
 
-if __name__ == "__main__":
-    main()
+@app.errorhandler(500)
+def server_error(error):
+    return jsonify({
+        'error': 'Internal server error'
+    }), 500
+
+if __name__ == '__main__':
+    app.run(port=5000, debug=True)

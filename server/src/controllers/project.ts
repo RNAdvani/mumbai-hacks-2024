@@ -40,7 +40,7 @@ export const createProject = TryCatch(async (req, res, next) => {
 })
 
 export const getProjects = TryCatch(async (req, res, next) => {
-  const { organisationId } = req.body
+  const organisationId  = req.params.id
   console.log(organisationId)
   //   const Organisation = await organisation.findById(organisationId)
   //   console.log(Organisation)

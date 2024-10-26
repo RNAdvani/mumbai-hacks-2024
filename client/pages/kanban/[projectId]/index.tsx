@@ -1,8 +1,8 @@
-import React from 'react'
-import DefaultLayout from '../../components/pages/default-layout'
-import { useAppContext } from '../../providers/app-provider'
 import { useRouter } from 'next/router'
-import KanbanBoard from '../../components/kanban'
+import React from 'react'
+import DefaultLayout from '../../../components/pages/default-layout'
+import KanbanBoard from '../../../components/kanban'
+
 
 export default function Conversation({
   children,
@@ -10,12 +10,6 @@ export default function Conversation({
   children: React.ReactNode
 }) {
   const router = useRouter()
-  const {
-    data: organisationData,
-    channel,
-    channelMessagesQuery,
-    conversationMessagesQuery,
-  } = useAppContext()
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {

@@ -91,5 +91,5 @@ taskSchema.post('save', function () {
         }
     });
 });
-exports.Task = mongoose_1.default.models.Task || mongoose_1.default.model('Task', taskSchema);
+exports.Task = mongoose_1.default.model('Task', taskSchema);
 //# sourceMappingURL=task.js.map

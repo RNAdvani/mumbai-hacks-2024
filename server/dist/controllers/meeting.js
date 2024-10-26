@@ -13,10 +13,8 @@ exports.createMeeting = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__a
     const { title, description, scheduledStartTime, scheduledEndTime, participantIds, } = req.body;
     // Check if user is a manager
     const user = yield user_1.default.findById(req.user.id);
-    const org = yield organisation_1.default.findOne({
-        $or: [{ owner: req.user.id }, { managers: req.user.id }],
-    });
-    if (!org || (user.role !== 'manager' && user.role !== 'owner')) {
+    const org = yield organisation_1.default.findOne({ owner: req.user.id });
+    if (!org || user.role !== 'manager') {
         return next(new errorResponse_1.ErrorHandler(403, 'You are not authorized to create a meeting'));
     }
     // Generate unique room ID

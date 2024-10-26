@@ -27,7 +27,7 @@ function createTeammates(req, res, next) {
                     try {
                         channel = yield channel_1.default.findOneAndUpdate({ _id: channelId }, { $addToSet: { collaborators: id } }, { new: true }).populate('collaborators');
                         const user = yield user_1.default.findById(id);
-                        (0, sendEmail_1.default)(user.email, `${invitedBy.email} has invited you to work with them in Slack`, (0, join_teammates_email_1.joinTeammatesEmail)(invitedBy.username, invitedBy.email, organisation.name, req.user.id, organisation.joinLink, organisation.url));
+                        (0, sendEmail_1.default)(user.email, `${invitedBy.email} has invited you to work with them in NGENX`, (0, join_teammates_email_1.joinTeammatesEmail)(invitedBy.username, invitedBy.email, organisation.name, req.user.id, organisation.joinLink, organisation.url));
                     }
                     catch (error) {
                         next(error);
@@ -44,7 +44,7 @@ function createTeammates(req, res, next) {
                         channel = yield channel_1.default.findOneAndUpdate({ _id: channelId }, { $push: { collaborators: newUser._id } }, { new: true }).populate('collaborators');
                         yield organisation_1.default.findOneAndUpdate({ _id: organisationId }, { $push: { coWorkers: newUser._id } });
                         // send email to the ids
-                        (0, sendEmail_1.default)(email, `${invitedBy.email} has invited you to work with them in Slack`, (0, join_teammates_email_1.joinTeammatesEmail)(invitedBy.username, invitedBy.email, organisation.name, req.user.id, organisation.joinLink, organisation.url));
+                        (0, sendEmail_1.default)(email, `${invitedBy.email} has invited you to work with them in NGENX`, (0, join_teammates_email_1.joinTeammatesEmail)(invitedBy.username, invitedBy.email, organisation.name, req.user.id, organisation.joinLink, organisation.url));
                     }
                     catch (error) {
                         next(error);
@@ -77,7 +77,7 @@ function createTeammates(req, res, next) {
                                 }, { new: true }).populate(['coWorkers', 'owner']);
                             }
                             // vibe and inshallah
-                            (0, sendEmail_1.default)(email, `${invitedBy.email} has invited you to work with them in Slack`, (0, join_teammates_email_1.joinTeammatesEmail)(invitedBy.username, invitedBy.email, organisation.name, req.user.id, organisation.joinLink, organisation.url));
+                            (0, sendEmail_1.default)(email, `${invitedBy.email} has invited you to work with them in NGENX`, (0, join_teammates_email_1.joinTeammatesEmail)(invitedBy.username, invitedBy.email, organisation.name, req.user.id, organisation.joinLink, organisation.url));
                         }
                         catch (error) {
                             next(error);
@@ -159,10 +159,11 @@ exports.getTeammate = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awa
 }));
 exports.getTeammates = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const organisationId = req.params.id;
+    console.log(organisationId);
     const organisation = yield organisation_1.default.findById(organisationId).populate('coWorkers');
     if (!organisation) {
         return res.status(400).json({
-            name: 'Organisation not found',
+            name: 'Organisation not found and emememem',
         });
     }
     return (0, successResponse_1.default)(res, organisation.coWorkers);
