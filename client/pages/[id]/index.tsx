@@ -92,7 +92,7 @@ const Onboarding: NextPage = () => {
           company or team?
         </Text>
         <Text size="xs" mt="sm">
-          This will be the name of your Slack workspace &mdash; choose something
+          This will be the name of your NGENX workspace &mdash; choose something
           that your team will recognize.
         </Text>
         <form

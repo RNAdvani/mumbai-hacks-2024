@@ -87,9 +87,9 @@ const Workspaces: NextPage = () => {
         <Flex justify="center">
           <Stack spacing="xs" align="start" w="38%" justify="center">
             <Text fz="3xl" fw={600} c="white">
-              Get started on Slack
+              Get started on NGENX
             </Text>
-            <Text fz="sm" mt="xs" w="75%">
+            <Text fz="sm" mt="xs" w="85%">
               it's a new way to communicate with everyone you work with. it's
               faster, better organized, and more secure than email - and it's
               free to try.

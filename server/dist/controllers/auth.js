@@ -63,7 +63,7 @@ exports.register = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaite
     });
     const verificationToken = user.getVerificationCode();
     yield user.save();
-    (0, sendEmail_1.default)(email, 'Slack confirmation code', (0, confirmation_code_email_1.verificationHtml)(verificationToken));
+    (0, sendEmail_1.default)(email, 'NGENX confirmation code', (0, confirmation_code_email_1.verificationHtml)(verificationToken));
     return res.status(201).json({
         success: true,
         data: {
@@ -90,7 +90,7 @@ exports.signin = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(
     }
     const verificationToken = user.getVerificationCode();
     yield user.save();
-    (0, sendEmail_1.default)(email, 'Slack confirmation code', (0, confirmation_code_email_1.verificationHtml)(verificationToken));
+    (0, sendEmail_1.default)(email, 'NGENX confirmation code', (0, confirmation_code_email_1.verificationHtml)(verificationToken));
     res.status(201).json({
         success: true,
         data: {

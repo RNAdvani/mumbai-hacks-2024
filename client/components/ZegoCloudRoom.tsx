@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react'
-import Script from 'next/script'
 
 interface ZegoCloudRoomProps {
   meetingId: string

@@ -39,7 +39,7 @@ export async function createTeammates(
 
           sendEmail(
             user.email,
-            `${invitedBy.email} has invited you to work with them in Slack`,
+            `${invitedBy.email} has invited you to work with them in NGENX`,
             joinTeammatesEmail(
               invitedBy.username,
               invitedBy.email,
@@ -73,7 +73,7 @@ export async function createTeammates(
           // send email to the ids
           sendEmail(
             email,
-            `${invitedBy.email} has invited you to work with them in Slack`,
+            `${invitedBy.email} has invited you to work with them in NGENX`,
             joinTeammatesEmail(
               invitedBy.username,
               invitedBy.email,
@@ -130,7 +130,7 @@ export async function createTeammates(
             // vibe and inshallah
             sendEmail(
               email,
-              `${invitedBy.email} has invited you to work with them in Slack`,
+              `${invitedBy.email} has invited you to work with them in NGENX`,
               joinTeammatesEmail(
                 invitedBy.username,
                 invitedBy.email,
