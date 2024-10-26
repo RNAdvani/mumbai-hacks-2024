@@ -28,6 +28,7 @@ import createTodaysFirstMessage from './helpers/createTodaysFirstMessage'
 import passport from 'passport'
 import cookieSession from 'cookie-session'
 import { projectRoutes } from './routes/project'
+import meetings from './routes/meeting'
 
 const app = express()
 const server = http.createServer(app)
@@ -407,6 +408,7 @@ app.use('/api/v1/teammates', teammates)
 app.use('/api/v1/organisation', organisation)
 app.use('/api/v1/conversations', conversations)
 app.use("/api/v1/projects", projectRoutes);
+app.use('/api/v1/meetings', meetings)
 
 // error handler
 app.use(errorResponse)

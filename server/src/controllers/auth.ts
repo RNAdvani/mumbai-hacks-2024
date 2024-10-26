@@ -43,7 +43,11 @@ passport.serializeUser((user, done) => {
 })
 
 passport.deserializeUser((user, done) => {
-  done(null, user)
+  done(null, user as {
+    id: string
+    username: string
+    email: string
+  })
 })
 
 // @desc    Register user
