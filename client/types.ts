@@ -22,7 +22,7 @@ export type Project = {
 export type User = {
   _id: mongoose.Types.ObjectId
   username?: string
-  email?: string
+  email: string
   phone?: string
   profilePicture?: string
   isOnline?: boolean

@@ -10,6 +10,7 @@
     "watch": "concurrently \"npm run watch --prefix server\" \"npm run watch --prefix packages/types\""
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.0",
     "express": "^4.21.0",
     "lucide-react": "^0.453.0"
   },
