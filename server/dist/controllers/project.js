@@ -32,7 +32,7 @@ exports.createProject = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__a
     (0, successResponse_1.default)(res, project);
 }));
 exports.getProjects = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-    const { organisationId } = req.body;
+    const organisationId = req.params.id;
     console.log(organisationId);
     //   const Organisation = await organisation.findById(organisationId)
     //   console.log(Organisation)

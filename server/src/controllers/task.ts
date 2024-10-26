@@ -1,4 +1,4 @@
-import { TryCatch } from "src/helpers/TryCatch";
+import { TryCatch } from "../helpers/TryCatch";
 
 export const  assignTask = TryCatch(async(req,res,next)=>{
     

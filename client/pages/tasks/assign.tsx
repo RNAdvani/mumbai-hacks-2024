@@ -57,7 +57,7 @@ const TaskAssignPage = () => {
 
   const handleTaskCreate = async () => {
     try {
-      await axios.post('/api/tasks', taskData)
+      await axios.post('/tasks/create', taskData)
       showNotification({
         title: 'Success',
         message: 'Task assigned successfully!',
