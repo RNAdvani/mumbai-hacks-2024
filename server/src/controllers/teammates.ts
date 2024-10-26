@@ -224,7 +224,8 @@ export const getTeammate = TryCatch(async (req, res, next) => {
 })
 
 export const getTeammates = TryCatch(async (req, res, next) => {
-  const organisationId = req.body
+  const organisationId = req.params.id
+  console.log(organisationId)
   const organisation = await Organisation.findById(organisationId).populate(
     'coWorkers'
   )

@@ -33,9 +33,7 @@ const TaskAssignPage = () => {
     const fetchData = async () => {
       try {
         const [employeesRes, projectsRes] = await Promise.all([
-          axios.post(`/teammates/employees/${organisationId}`, {
-            organisationId,
-          }), // send org ID in body
+          axios.get(`/teammates/employees/${organisationId}`), // send org ID in body
           axios.post(`/projects/get/${organisationId}`, { organisationId }), // send org ID in body
         ])
 

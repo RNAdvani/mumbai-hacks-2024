@@ -159,10 +159,11 @@ exports.getTeammate = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awa
 }));
 exports.getTeammates = (0, TryCatch_1.TryCatch)((req, res, next) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const organisationId = req.params.id;
+    console.log(organisationId);
     const organisation = yield organisation_1.default.findById(organisationId).populate('coWorkers');
     if (!organisation) {
         return res.status(400).json({
-            name: 'Organisation not found',
+            name: 'Organisation not found and emememem',
         });
     }
     return (0, successResponse_1.default)(res, organisation.coWorkers);
