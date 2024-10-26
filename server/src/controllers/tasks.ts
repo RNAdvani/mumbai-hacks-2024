@@ -2,6 +2,7 @@ import { Task } from "../models/task";
 import { TryCatch } from "../helpers/TryCatch";
 import { ErrorHandler } from "../middleware/errorResponse";
 import { Project } from "../models/project";
+import mongoose from "mongoose";
 
 export const createTask = TryCatch(async (req, res, next) => {
     const {
@@ -54,6 +55,7 @@ export const createTask = TryCatch(async (req, res, next) => {
         { path: 'project', select: 'name' },
         { path: 'dependencies', select: 'title' }
       ])
+
   
       res.status(201).json({
         success: true,

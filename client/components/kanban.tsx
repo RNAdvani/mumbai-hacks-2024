@@ -1,10 +1,18 @@
-import React, { useState } from 'react'
-import { Plus, X, Edit2, Check } from 'lucide-react'
+'use client'
 
-type Task = {
-  id: number
-  text: string
-}
+import React, { useState, useEffect } from 'react'
+import {
+  Plus,
+  X,
+  Edit2,
+  Check,
+  Clock,
+  User,
+  Tag,
+  MessageSquare,
+  Paperclip,
+} from 'lucide-react'
+import { Task } from '../types'
 
 type Column = {
   id: number
@@ -16,34 +24,61 @@ const initialColumns: Column[] = [
   {
     id: 1,
     title: 'To Do',
-    tasks: [
-      { id: 1, text: 'Task 1' },
-      { id: 2, text: 'Task 2' },
-    ],
+    tasks: [] as Task[],
   },
   {
     id: 2,
     title: 'In Progress',
-    tasks: [],
+    tasks: [] as Task[],
   },
   {
     id: 3,
-    title: 'Done',
-    tasks: [],
+    title: 'Review',
+    tasks: [] as Task[],
+  },
+  {
+    id: 4,
+    title: 'Completed',
+    tasks: [] as Task[],
   },
 ]
 
-const KanbanBoard = () => {
+const KanbanBoard = ({ tasks }: { tasks: Task[] }) => {
   const [columns, setColumns] = useState<Column[]>(initialColumns)
   const [draggedTask, setDraggedTask] = useState<Task | null>(null)
-  const [newTask, setNewTask] = useState('')
-  const [editingTask, setEditingTask] = useState<{
-    id: number
-    text: string
-  } | null>(null)
   const [draggedOverColumn, setDraggedOverColumn] = useState<number | null>(
     null
   )
+
+  // Distribute tasks to columns based on status
+  useEffect(() => {
+    const newColumns = initialColumns.map((column) => ({
+      ...column,
+      tasks: [] as Task[],
+    }))
+
+    tasks.forEach((task) => {
+      console.log(`Task status: ${task.status}`) // Log the task status to verify
+      switch (task.status) {
+        case 'todo':
+          newColumns[0].tasks.push(task)
+          break
+        case 'in-progress':
+          newColumns[1].tasks.push(task)
+          break
+        case 'review':
+          newColumns[2].tasks.push(task)
+          break
+        case 'completed':
+          newColumns[3].tasks.push(task)
+          break
+        default:
+          console.warn(`Unrecognized status: ${task.status}`) // Log if status does not match any case
+      }
+    })
+
+    setColumns(newColumns)
+  }, [tasks])
 
   const onDragStart = (task: Task) => {
     setDraggedTask(task)
@@ -59,78 +94,50 @@ const KanbanBoard = () => {
   }
 
   const onDrop = (columnId: number) => {
-    if (draggedTask) {
-      setColumns((prevColumns) =>
-        prevColumns.map((column) => {
-          if (column.id === columnId) {
-            return { ...column, tasks: [...column.tasks, draggedTask] }
-          }
-          return {
-            ...column,
-            tasks: column.tasks.filter((task) => task.id !== draggedTask.id),
-          }
-        })
-      )
-      setDraggedTask(null)
-      setDraggedOverColumn(null)
+    if (!draggedTask) return
+
+    // Map column IDs to status
+    const statusMap: { [key: number]: Task['status'] } = {
+      1: 'todo',
+      2: 'in-progress',
+      3: 'review',
+      4: 'completed',
+    }
+
+    const newStatus = statusMap[columnId]
+    if (!newStatus) return
+
+    // Update task status here
+    // You'll need to implement this based on your data management approach
+    console.log(`Task ${draggedTask.title} moved to ${newStatus}`)
+
+    setDraggedTask(null)
+    setDraggedOverColumn(null)
+  }
+
+  const getPriorityColor = (priority: Task['priority']) => {
+    switch (priority) {
+      case 'high':
+        return 'bg-red-500'
+      case 'medium':
+        return 'bg-yellow-500'
+      case 'low':
+        return 'bg-green-500'
+      default:
+        return 'bg-gray-500'
     }
   }
 
-  const addTask = (columnId: number) => {
-    if (newTask.trim()) {
-      const newTaskObj = {
-        id:
-          Math.max(...columns.flatMap((col) => col.tasks.map((t) => t.id)), 0) +
-          1,
-        text: newTask.trim(),
-      }
-
-      setColumns((prevColumns) =>
-        prevColumns.map((column) =>
-          column.id === columnId
-            ? { ...column, tasks: [...column.tasks, newTaskObj] }
-            : column
-        )
-      )
-      setNewTask('')
-    }
-  }
-
-  const deleteTask = (taskId: number) => {
-    setColumns((prevColumns) =>
-      prevColumns.map((column) => ({
-        ...column,
-        tasks: column.tasks.filter((task) => task.id !== taskId),
-      }))
-    )
-  }
-
-  const startEditingTask = (task: Task) => {
-    setEditingTask({ id: task.id, text: task.text })
-  }
-
-  const updateTask = () => {
-    if (editingTask) {
-      setColumns((prevColumns) =>
-        prevColumns.map((column) => ({
-          ...column,
-          tasks: column.tasks.map((task) =>
-            task.id === editingTask.id
-              ? { ...task, text: editingTask.text }
-              : task
-          ),
-        }))
-      )
-      setEditingTask(null)
-    }
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString()
   }
 
   return (
-    <div className="flex gap-6 p-6 bg-[#1A1B1E] min-h-screen">
+    <div className="flex gap-6 p-6 bg-[#1A1B1E] min-h-screen overflow-x-auto">
       {columns.map((column) => (
         <div
           key={column.id}
-          className={`flex-1 bg-[#27282c] rounded-lg p-4 flex flex-col ${
+          className={`flex-1 min-w-[350px] bg-[#27282c] rounded-lg p-4 flex flex-col ${
             draggedOverColumn === column.id ? 'border-2 border-blue-500' : ''
           }`}
           onDragOver={(e) => onDragOver(e, column.id)}
@@ -141,65 +148,73 @@ const KanbanBoard = () => {
             {column.title}
           </h2>
 
-          <div className="flex mb-8">
-            <input
-              type="text"
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-              className="flex-1 px-3 py-4 bg-[#404146] text-white rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="New task..."
-            />
-            <button
-              onClick={() => addTask(column.id)}
-              className="px-3 py-2 bg-blue-500 text-white rounded-r-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <Plus size={20} />
-            </button>
-          </div>
-
-          <div className="flex-1 space-y-2">
+          <div className="flex-1 space-y-4 overflow-y-auto">
             {column.tasks.map((task) => (
               <div
-                key={task.id}
+                key={task.title}
                 draggable
                 onDragStart={() => onDragStart(task)}
-                className="bg-gray-700 p-3 rounded-md group flex items-center justify-between cursor-grab active:cursor-grabbing hover:bg-gray-600 transition-colors"
+                className="bg-gray-700 p-4 rounded-md group flex flex-col gap-3 cursor-grab active:cursor-grabbing hover:bg-gray-600 transition-colors"
               >
-                {editingTask?.id === task.id ? (
-                  <div className="flex-1 flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={editingTask.text}
-                      onChange={(e) =>
-                        setEditingTask({ ...editingTask, text: e.target.value })
-                      }
-                      className="flex-1 px-2 py-1 bg-gray-800 text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <button
-                      onClick={updateTask}
-                      className="p-1 text-green-400 hover:text-green-300"
-                    >
-                      <Check size={16} />
-                    </button>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-white font-semibold flex-1">
+                    {task.title}
+                  </h3>
+                  <div
+                    className={`w-3 h-3 rounded-full ${getPriorityColor(
+                      task.priority
+                    )}`}
+                  />
+                </div>
+
+                <p className="text-gray-300 text-sm line-clamp-2">
+                  {task.description}
+                </p>
+
+                <div className="flex items-center gap-4 text-gray-400 text-sm">
+                  <div className="flex items-center gap-1">
+                    <Clock size={14} />
+                    <span>{formatDate(task.dueDate)}</span>
                   </div>
-                ) : (
-                  <>
-                    <span className="text-white flex-1">{task.text}</span>
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button
-                        onClick={() => startEditingTask(task)}
-                        className="p-1 text-blue-400 hover:text-blue-300"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => deleteTask(task.id)}
-                        className="p-1 text-red-400 hover:text-red-300"
-                      >
-                        <X size={16} />
-                      </button>
+                  <div className="flex items-center gap-1">
+                    <User size={14} />
+                    <span>{task.assignedTo.length}</span>
+                  </div>
+                  {task.attachments.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <Paperclip size={14} />
+                      <span>{task.attachments.length}</span>
                     </div>
-                  </>
+                  )}
+                  {task.comments.length > 0 && (
+                    <div className="flex items-center gap-1">
+                      <MessageSquare size={14} />
+                      <span>{task.comments.length}</span>
+                    </div>
+                  )}
+                </div>
+
+                {task.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {task.tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="px-2 py-1 bg-gray-600 text-xs text-gray-300 rounded-full flex items-center gap-1"
+                      >
+                        <Tag size={12} />
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {task.progress > 0 && (
+                  <div className="w-full bg-gray-600 rounded-full h-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full"
+                      style={{ width: `${task.progress}%` }}
+                    />
+                  </div>
                 )}
               </div>
             ))}

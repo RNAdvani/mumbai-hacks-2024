@@ -70,10 +70,10 @@ const useStyles = createStyles((theme) => ({
     },
   },
 }))
-export default function DefaultLayout({
+const DefaultLayout =({
   children,
   thread,
-}: DefaultLayoutProps) {
+}: DefaultLayoutProps) => {
   const router = useRouter()
   const { classes } = useStyles()
   const [opened, { open, close }] = useDisclosure(false)
@@ -478,3 +478,5 @@ export default function DefaultLayout({
     </>
   )
 }
+
+export default DefaultLayout
